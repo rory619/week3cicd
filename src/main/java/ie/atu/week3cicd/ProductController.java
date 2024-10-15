@@ -26,23 +26,33 @@ public class ProductController {
 
     //post Endpoint to add a new product
     @PostMapping
-    public Product addProduct(@RequestBody Product newProduct){
+    public Product addProduct(@RequestBody Product newProduct) {
         productList.add(newProduct);
         return newProduct;
+    }
 
-    @PutMapping
-
+        @PutMapping("/{id}")
+        public ResponseEntity<Product> updateProduct(@PathVariable("id") String id, @RequestBody Product updatedProduct) {
+        for(int i = 0; i < productList.size(); i++){
+            Product existingProduct = productList.get(i);
+            if(existingProduct.getId().equals(id)){
+                productList.set(i, updatedProduct);
+                return ResponseEntity.ok(updatedProduct);
+            }
+        }
+        return ResponseEntity.notFound().build();
+        }
 
         @DeleteMapping("/{id}")
-                public ResponceEntity<List> deleteProduct(@PathVariable String id){
-            for (Product p : productList) {
-                if(p.getId().equals(id)){
-                    productList.remove(p);
-                }
+                public ResponseEntity<List<Product>> deleteProduct(@PathVariable String id){
+        boolean removed = productList.removeIf(p -> p.getId().equals(id));
+           if (removed){
+               return ResponseEntity.ok(productList);
+           }
+           else{
+               return ResponseEntity.notFound().build();
+           }
 
-            }
-
-            return ResponceEntity.ok(productList);
         }
     }
-}
+
